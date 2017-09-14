@@ -86,17 +86,11 @@ public class ListarEsteAno extends JFrame{
 			
 			 Statement stm=conexion.createStatement();
 			 ResultSet rset=stm.executeQuery("select NOMBREEMPLE,APELLIDOPRIMERO,APELLIDOSEGUNDO, MAIL,FECHNACIMIENTO ,SALDO, AMIGO	,TELEFONO, CUERPO,	EDAD, MODISTA,COMPONENTE, NUEVO from COMPONENTE order by NOMBREEMPLE");
-			 
-		
-			 
-			 
+		 
 			 cursos.removeAllItems();
-			 
-			 
-			 
-			 
-			 
+
 			 while (rset.next()){
+				 System.out.println("Listadoooooooooooooooooooooooo");
 				 if(rset.getString("COMPONENTE").equals("Si")){
 				 cursos.addItem(rset.getString(1)+" "+rset.getString(2));
 				 total=total+1;

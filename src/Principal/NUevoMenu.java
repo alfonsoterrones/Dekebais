@@ -1,64 +1,70 @@
 package Principal;
 
+//import java.applet.Applet;
 import java.awt.BorderLayout;
-import java.awt.Color;
+//import java.awt.Color;
 
 import Morosos.MenuMorosos;
-import java.awt.Dimension;
+//import java.awt.Dimension;
 
 import Pagos.ListaPagos;
 import oracle.jdbc.pool.OracleDataSource;
 
 import java.awt.EventQueue;
-import java.awt.Graphics;
+//import java.awt.Graphics;
 import ListarBailarinas.ListarBailarinas;
 
-import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+//import javax.swing.GroupLayout;
+//import javax.swing.ImageIcon;
+//import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+//import javax.swing.JLabel;
+//import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+//import org.apache.log4j.BasicConfigurator;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+//import java.awt.event.ActionEvent;
+//import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+//import java.util.logging.Logger;
 
-import javax.swing.JTable;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
+//import javax.swing.JTable;
+//import javax.swing.GroupLayout.Alignment;
+//import javax.swing.LayoutStyle.ComponentPlacement;
 
 import AgregarComponente.SwingAgregarCampos;
 import Infantil.ListarInfantiles;
-import Morosos.CuotaCinco;
-import Morosos.CuotaCuatro;
-import Morosos.CuotaDos;
-import Morosos.CuotaTres;
-import Morosos.CuotaUno;
-import Morosos.ListarMorosos;
+//import Morosos.CuotaCinco;
+//import Morosos.CuotaCuatro;
+//import Morosos.CuotaDos;
+//import Morosos.CuotaTres;
+//import Morosos.CuotaUno;
+//import Morosos.ListarMorosos;
 import BorrarComponente.ListarComponenteABorra;
 import Editar.ListadoAEditar;
-import ExcelListado.ExcelListado2;
+//import ExcelListado.ExcelListado2;
 import Arca.Arca;
 import ListarMusicos.ListarMusicos;
 import Modista.ListadoModista;
 
 public class NUevoMenu extends JFrame {
 
+	// private static String resourceBundleName;
 	private Fondo contentPane;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 
 		try {
@@ -79,75 +85,28 @@ public class NUevoMenu extends JFrame {
 			Class.forName("oracle.jdbc.OracleDriver");
 
 			Statement stm = conexion.createStatement();
+			Statement stmUpdate = conexion.createStatement();
 			ResultSet rset = stm.executeQuery(
-					"select NOMBREEMPLE,APELLIDOPRIMERO,APELLIDOSEGUNDO, MAIL,FECHNACIMIENTO ,SALDO, AMIGO	,TELEFONO, CUERPO,	EDAD, MODISTA,COMPONENTE, NUEVO,SEXO from COMPONENTE order by NOMBREEMPLE");
-
-			String nombre;
-			String apellido1;
-			String apellido2;
-			String mail;
-			String fecha;
-			String saldo;
-			String amigo;
-			String telefono;
-			String cuerpo;
-			int edad;
-			String modista;
-			String apuntado;
-			String nuevo;
-			String sexo;
+					"select NOMBREEMPLE,APELLIDOPRIMERO,APELLIDOSEGUNDO, MAIL,FECHNACIMIENTO ,SALDO, AMIGO	,TELEFONO, CUERPO,	EDAD, MODISTA,COMPONENTE, NUEVO from COMPONENTE order by NOMBREEMPLE");
 			String fechaParaPoderAgregar;
 			String consulta;
 
 			while (rset.next()) {
 
-				// CALCULAR
-				// EDAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				int ano;
-				int mes;
-				int dia;
-
-				int anoDeComponente = 0;
-				int auxAno;
-				fechaParaPoderAgregar = (rset.getString("FECHNACIMIENTO").substring(8, 10) + "-"
-						+ rset.getString("FECHNACIMIENTO").substring(5, 7) + "-"
+				DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				fechaParaPoderAgregar = (rset.getString("FECHNACIMIENTO").substring(8, 10) + "/"
+						+ rset.getString("FECHNACIMIENTO").substring(5, 7) + "/"
 						+ rset.getString("FECHNACIMIENTO").substring(0, 4));
 
-				System.out.println(rset.getString("FECHNACIMIENTO").substring(0, 4));
-				System.out.println(rset.getString("FECHNACIMIENTO").substring(5, 7));
-				System.out.println(rset.getString("FECHNACIMIENTO").substring(8, 10));
-
-				ano = Integer.parseInt(rset.getString("FECHNACIMIENTO").substring(0, 4));
-				mes = Integer.parseInt(rset.getString("FECHNACIMIENTO").substring(5, 7));
-				dia = Integer.parseInt(rset.getString("FECHNACIMIENTO").substring(8, 10));
-
-				Calendar cal = Calendar.getInstance();
-
-				auxAno = ano;
-				while (auxAno < cal.get(Calendar.YEAR)) {
-
-					auxAno++;
-					anoDeComponente = anoDeComponente + 1;
-
-				}
-
-				if (cal.get(Calendar.MONTH) + 1 < mes) {
-					anoDeComponente = anoDeComponente - 1;
-
-				} else {
-					if (cal.get(Calendar.MONTH) + 1 == mes && cal.get(Calendar.DAY_OF_MONTH) < dia) {
-						anoDeComponente = anoDeComponente - 1;
-					}
-				}
-
-				System.out.println(anoDeComponente);
-
-				consulta = "UPDATE COMPONENTE SET EDAD=" + anoDeComponente + " WHERE NOMBREEMPLE='"
+				LocalDate fechaNac = LocalDate.parse(fechaParaPoderAgregar, fmt);
+				LocalDate ahora = LocalDate.now();
+				Period periodo = Period.between(fechaNac, ahora);
+				
+				//UPDATE
+				consulta = "UPDATE COMPONENTE SET EDAD=" + periodo.getYears() + " WHERE NOMBREEMPLE='"
 						+ rset.getString("NOMBREEMPLE") + "' AND APELLIDOPRIMERO='" + rset.getString("APELLIDOPRIMERO")
 						+ "' AND APELLIDOSEGUNDO='" + rset.getString("APELLIDOSEGUNDO") + "'";
-				stm.executeUpdate(consulta);
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+				stmUpdate.executeUpdate(consulta);
 			}
 
 			stm.close();
@@ -338,8 +297,7 @@ public class NUevoMenu extends JFrame {
 
 		// CADUCIDADDDDDD!!!!!!!!!
 		Calendar cal = Calendar.getInstance();
-		System.err.println(cal.get(Calendar.YEAR));
-		if (cal.get(Calendar.YEAR) == 2018) {
+		if (cal.get(Calendar.YEAR) == 2019) {
 			setVisible(false);
 		} else {
 			setVisible(true);
